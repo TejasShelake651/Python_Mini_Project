@@ -1,0 +1,9 @@
+Operating Systems Architecture and Process Management
+An Operating System acts as an intermediary between the computer user and hardware.
+The primary objectives of an operating system are convenience, computational efficiency, and evolution.
+A process is a program in execution, consisting of program code, stack, registers, and memory space.
+Process Scheduling is an essential operating system task that decides which process runs on the CPU.
+Context switching is the mechanism of saving the state of an active process and restoring another state.
+Inter-Process Communication allows processes to synchronize and communicate through shared memory or message passing.
+Virtual memory allows the execution of processes that may not be completely in physical RAM using demand paging.
+Deadlock occurs when a set of concurrent processes are blocked because each process is holding a resource and waiting for another.

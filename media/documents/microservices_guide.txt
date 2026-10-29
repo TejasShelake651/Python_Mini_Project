@@ -1,0 +1,13 @@
+
+Microservices Architecture and Distributed Systems Overview.
+A microservices architecture is a design approach to build an application as a set of small independently deployable services.
+Service Discovery allows automatic detection of devices and services offered by an API over a network.
+API Gateway acts as the single entry point for all client requests and routes them to appropriate microservices.
+Distributed Database management ensures data consistency across partition boundaries using consensus protocols.
+Load Balancing distributes network traffic across multiple servers to ensure high availability and reliability.
+Authentication and Authorization verifies user identity using JSON Web Tokens (JWT) and enforces role-based access control.
+Container Orchestration with Kubernetes automates deployment, scaling, and operational management of containerized workloads.
+Monitoring and Telemetry provides real-time observability into microservice performance, latency metrics, and error traces.
+Event-Driven Architecture utilizes message brokers to produce and consume asynchronous events across decoupled services.
+Fault Tolerance and Circuit Breakers prevent cascading failures across interconnected service nodes.
+Continuous Integration and Deployment pipelines automate build testing and container releases.

@@ -1,0 +1,649 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySphere — AI Multi-Format Learning Studio & Knowledge Synthesis</title>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}?v=3.0">
+</head>
+<body class="landing-body">
+
+    <!-- Subtle Technical Grid Overlay -->
+    <div class="bg-grid-overlay"></div>
+
+    <div class="lp-container">
+
+        <!-- ================= Minimalist Navbar ================= -->
+        <header class="lp-navbar">
+            <nav class="lp-nav-inner">
+                <a href="{% url 'landing' %}" class="lp-brand-group">
+                    <div class="lp-logo-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="lp-logo-text">StudySphere</span>
+                    <span class="lp-version-tag">2.0 Visual</span>
+                </a>
+
+                <ul class="lp-nav-links">
+                    <li><a href="#overview" class="lp-nav-link">Overview</a></li>
+                    <li><a href="#learning-modes" class="lp-nav-link">9 Modes</a></li>
+                    <li><a href="#features" class="lp-nav-link">Comparison</a></li>
+                    <li><a href="#faq" class="lp-nav-link">FAQ</a></li>
+                </ul>
+
+                <div class="lp-nav-actions">
+                    <a href="{% url 'studio' %}" class="lp-btn-primary">
+                        <span>Launch Studio</span>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- ================= Hero Section ================= -->
+        <section class="lp-hero-section">
+            <div class="lp-announcement-pill">
+                <span class="lp-pill-badge">SYSTEM 2.0</span>
+                <span>AI-Powered Multi-Format Learning & Real-Time Synthesis</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <h1 class="lp-hero-headline">
+                Transform Any Study Material Into <br>
+                <span class="hero-gradient-text">9 High-Precision Learning Modes.</span>
+            </h1>
+
+            <p class="lp-hero-subhead">
+                Drop any textbook chapter, syllabus, research PDF, or lecture notes. StudySphere instantly synthesizes your content into <strong>9 synchronized modalities</strong> — real-view interactive charts, 3D active recall flashcards, physics concept networks, spoken audio podcasts, and timed mock exams.
+            </p>
+
+            <div class="lp-hero-cta-group">
+                <a href="{% url 'studio' %}" class="lp-btn-primary lp-btn-large">
+                    <span>Upload Notes & Open Workspace</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+                <a href="#learning-modes" class="lp-btn-secondary lp-btn-large">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Explore 9 Learning Modes</span>
+                </a>
+            </div>
+
+            <div class="lp-trust-row">
+                <div class="lp-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Local & Private Synthesis</span>
+                </div>
+                <div class="lp-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Real-View Chart.js & Mermaid</span>
+                </div>
+                <div class="lp-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Ebbinghaus Memory Intervals</span>
+                </div>
+                <div class="lp-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
+                    <span>PDF, DOCX, CSV & TXT</span>
+                </div>
+            </div>
+
+            <!-- ================= Product Architecture Showcase Window ================= -->
+            <div class="lp-mock-window" id="overview">
+                <div class="lp-mock-titlebar">
+                    <div class="lp-window-dots">
+                        <div class="lp-dot lp-dot-red"></div>
+                        <div class="lp-dot lp-dot-yellow"></div>
+                        <div class="lp-dot lp-dot-green"></div>
+                    </div>
+                    <div class="lp-window-url">studysphere.ai/studio/knowledge-workspace</div>
+                    <div class="lp-window-status">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span>LIVE SYNTHESIS</span>
+                    </div>
+                </div>
+
+                <div class="lp-mock-viewport">
+                    <div class="lp-showcase-grid">
+                        
+                        <!-- Panel 1: Topic Significance Spectrum -->
+                        <div class="lp-showcase-card">
+                            <div class="lp-card-header">
+                                <span class="lp-card-tag">Frequency Spectrum</span>
+                                <span class="lp-card-badge">Top Clusters</span>
+                            </div>
+                            <div class="lp-bars-wrap">
+                                <div class="lp-bar-row">
+                                    <div class="lp-bar-label">
+                                        <span>Foundational Principles & Scope</span>
+                                        <span>34%</span>
+                                    </div>
+                                    <div class="lp-bar-track">
+                                        <div class="lp-bar-fill" style="width: 92%;"></div>
+                                    </div>
+                                </div>
+                                <div class="lp-bar-row">
+                                    <div class="lp-bar-label">
+                                        <span>Structural Operations & Hierarchy</span>
+                                        <span>26%</span>
+                                    </div>
+                                    <div class="lp-bar-track">
+                                        <div class="lp-bar-fill" style="width: 76%;"></div>
+                                    </div>
+                                </div>
+                                <div class="lp-bar-row">
+                                    <div class="lp-bar-label">
+                                        <span>Analytical Validation & Tests</span>
+                                        <span>22%</span>
+                                    </div>
+                                    <div class="lp-bar-track">
+                                        <div class="lp-bar-fill" style="width: 64%;"></div>
+                                    </div>
+                                </div>
+                                <div class="lp-bar-row">
+                                    <div class="lp-bar-label">
+                                        <span>Practical Synthesis & Output</span>
+                                        <span>18%</span>
+                                    </div>
+                                    <div class="lp-bar-track">
+                                        <div class="lp-bar-fill" style="width: 50%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Process Stepper Pipeline -->
+                        <div class="lp-showcase-card">
+                            <div class="lp-card-header">
+                                <span class="lp-card-tag">Pipeline Execution</span>
+                                <span class="lp-card-badge">Live Stepper</span>
+                            </div>
+                            <div class="lp-stepper-wrap">
+                                <div class="lp-step-node">
+                                    <div class="lp-step-num">1</div>
+                                    <div>
+                                        <div class="lp-step-title">Document Ingestion</div>
+                                        <div class="lp-step-sub">Token extraction & stopword sanitize</div>
+                                    </div>
+                                </div>
+                                <div class="lp-step-node">
+                                    <div class="lp-step-num">2</div>
+                                    <div>
+                                        <div class="lp-step-title">Semantic Parsing</div>
+                                        <div class="lp-step-sub">Architectural entities & relationship mapping</div>
+                                    </div>
+                                </div>
+                                <div class="lp-step-node">
+                                    <div class="lp-step-num">3</div>
+                                    <div>
+                                        <div class="lp-step-title">Modal Synthesis</div>
+                                        <div class="lp-step-sub">Charts, flashcards, quizzes & cheatsheets</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Spaced Retention Science -->
+                        <div class="lp-showcase-card">
+                            <div class="lp-card-header">
+                                <span class="lp-card-tag">Cognitive Recall</span>
+                                <span class="lp-card-badge">Ebbinghaus</span>
+                            </div>
+                            <div class="lp-gauge-center">
+                                <div class="lp-gauge-num">94%</div>
+                                <div class="lp-gauge-label">Consolidated Recall</div>
+                                <div style="font-size: 0.76rem; color: var(--lp-text-secondary); margin-top: 10px; line-height: 1.5;">
+                                    Optimal spaced review intervals calculated to prevent natural memory forgetting.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="lp-showcase-footer">
+                        <div style="font-size: 0.8rem; color: var(--lp-text-secondary);">
+                            Interactive charts, physics maps, and live knowledge inspection are ready inside the studio workspace.
+                        </div>
+                        <a href="{% url 'studio' %}" class="lp-showcase-cta">
+                            <span>Open Studio Workspace</span>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Impact Statistics ================= -->
+        <section class="lp-metrics-grid">
+            <div class="lp-metric-card">
+                <div class="lp-metric-val">9</div>
+                <div class="lp-metric-label">Synchronized Modalities</div>
+            </div>
+            <div class="lp-metric-card">
+                <div class="lp-metric-val">50K+</div>
+                <div class="lp-metric-label">Concepts Mapped</div>
+            </div>
+            <div class="lp-metric-card">
+                <div class="lp-metric-val">300%</div>
+                <div class="lp-metric-label">Active Recall Gain</div>
+            </div>
+            <div class="lp-metric-card">
+                <div class="lp-metric-val">&lt; 3s</div>
+                <div class="lp-metric-label">Synthesis Latency</div>
+            </div>
+        </section>
+
+        <!-- ================= Bento Grid (9 Modes) ================= -->
+        <section class="lp-bento-section" id="learning-modes">
+            <div class="lp-section-header">
+                <span class="lp-section-tag">COMPREHENSIVE ECOSYSTEM</span>
+                <h2 class="lp-section-title">9 Multi-Format Learning Modes</h2>
+                <p class="lp-section-desc">
+                    Every learner retains information differently. StudySphere transforms your single uploaded document into nine synchronized representations automatically.
+                </p>
+            </div>
+
+            <div class="lp-bento-grid">
+                <!-- 1. Real-View Visual Studio (2 Cols) -->
+                <div class="lp-bento-item bento-col-2">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </div>
+                        <h3 class="bento-title">Real-View Visual Studio & Charts</h3>
+                        <p class="bento-desc">
+                            Interactive Chart.js visualizations that replace static pictures. Explore Topic Significance Bars, 6-Axis Cognitive Mastery Radars, and Curriculum Share Doughnuts with zoom, pan, and real-time concept inspection.
+                        </p>
+                    </div>
+                    <div class="bento-visual-preview">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="preview-pill">Topic Bars</span>
+                            <span class="preview-pill">Mastery Radar</span>
+                            <span class="preview-pill">Curriculum Donut</span>
+                            <span class="preview-pill">Retention Curve</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Process Flowcharts -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(5, 150, 105, 0.1); color: #059669;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                        </div>
+                        <h3 class="bento-title">Execution Flowcharts</h3>
+                        <p class="bento-desc">
+                            Automated step-by-step pipeline walkthroughs with stage tags, output artifacts, and auto-play walkthroughs.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. Physics Concept Map -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                        </div>
+                        <h3 class="bento-title">Force-Directed Mind-Maps</h3>
+                        <p class="bento-desc">
+                            Interactive physics simulation with spring elasticity, draggable nodes, clean relationship edges, and search filters.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4. 3D Flashcards -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="12" x="4" y="6" rx="2"></rect><path d="M8 2h8"></path><path d="M6 4h12"></path></svg>
+                        </div>
+                        <h3 class="bento-title">Active Recall Flashcards</h3>
+                        <p class="bento-desc">
+                            Smooth perspective 3D cards for terms and definitions, designed for active recall memory consolidation.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 5. Ebbinghaus Memory Matrix -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(217, 119, 6, 0.1); color: #d97706;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <h3 class="bento-title">Ebbinghaus Retention</h3>
+                        <p class="bento-desc">
+                            Simulate your natural forgetting curve over 30 days and discover optimal spaced repetition review intervals.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 6. Audio Podcast -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(225, 29, 72, 0.1); color: #e11d48;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                        </div>
+                        <h3 class="bento-title">Audio Briefings</h3>
+                        <p class="bento-desc">
+                            Listen to synthesized spoken study briefings on the go, with 1x/1.25x/1.5x speed controls and synchronous transcript text.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 7. Interactive Quizzes -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <h3 class="bento-title">Practice Quizzes</h3>
+                        <p class="bento-desc">
+                            Instant evaluation, score tracking, and detailed sentence explanations to test comprehension immediately.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 8. Timed Mock Exams -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                        </div>
+                        <h3 class="bento-title">Timed Mock Exams</h3>
+                        <p class="bento-desc">
+                            10-question formal mock exams with a 10-minute countdown timer and comprehensive performance transcripts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 9. 1-Page Cheatsheets -->
+                <div class="lp-bento-item">
+                    <div>
+                        <div class="bento-icon-box" style="background: rgba(15, 23, 42, 0.08); color: #0f172a;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect width="12" height="8" x="6" y="14"></rect></svg>
+                        </div>
+                        <h3 class="bento-title">Printable Cheatsheets</h3>
+                        <p class="bento-desc">
+                            Clean 1-page condensed revision sheets with structured takeaways formatted for exam day printing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Comparison Section ================= -->
+        <section class="lp-comparison-section" id="features">
+            <div class="lp-section-header">
+                <span class="lp-section-tag">COGNITIVE ARCHITECTURE</span>
+                <h2 class="lp-section-title">Why Visual Synthesis Outperforms Static Reading</h2>
+                <p class="lp-section-desc">
+                    Traditional notes promote passive re-reading. StudySphere engages multi-modal sensory networks for proven retention.
+                </p>
+            </div>
+
+            <div class="lp-comparison-table-wrap">
+                <div class="lp-comp-row comp-header">
+                    <div>Learning Capability</div>
+                    <div>StudySphere Studio</div>
+                    <div>Traditional Notes & PDFs</div>
+                </div>
+                <div class="lp-comp-row">
+                    <div class="comp-feature-name">Visual Representation</div>
+                    <div class="comp-studysphere-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Live Interactive Charts & Flowcharts</span>
+                    </div>
+                    <div class="comp-traditional-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Flat, unclickable text</span>
+                    </div>
+                </div>
+                <div class="lp-comp-row">
+                    <div class="comp-feature-name">Active Recall Testing</div>
+                    <div class="comp-studysphere-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Flip Flashcards & Instant Quizzes</span>
+                    </div>
+                    <div class="comp-traditional-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Requires manual card creation</span>
+                    </div>
+                </div>
+                <div class="lp-comp-row">
+                    <div class="comp-feature-name">Memory Retention Intervals</div>
+                    <div class="comp-studysphere-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Ebbinghaus Decay Simulator</span>
+                    </div>
+                    <div class="comp-traditional-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Unstructured, prone to cramming</span>
+                    </div>
+                </div>
+                <div class="lp-comp-row">
+                    <div class="comp-feature-name">Multi-Modal Audio</div>
+                    <div class="comp-studysphere-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Spoken Briefings & Transcripts</span>
+                    </div>
+                    <div class="comp-traditional-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Silent reading only</span>
+                    </div>
+                </div>
+                <div class="lp-comp-row">
+                    <div class="comp-feature-name">Formal Exam Readiness</div>
+                    <div class="comp-studysphere-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>10-Minute Timed Mock Exam Simulation</span>
+                    </div>
+                    <div class="comp-traditional-col">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>No timed simulation</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Testimonials ================= -->
+        <section class="lp-testimonials-section">
+            <div class="lp-section-header">
+                <span class="lp-section-tag">PROVEN IMPACT</span>
+                <h2 class="lp-section-title">Trusted By Students & Researchers</h2>
+                <p class="lp-section-desc">
+                    Engineered to elevate comprehension for university finals, research reviews, and viva examinations.
+                </p>
+            </div>
+
+            <div class="lp-testimonials-grid">
+                <div class="lp-testimonial-card">
+                    <div class="test-stars">
+                        <span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span>
+                        <span class="test-verified-badge">Verified Student</span>
+                    </div>
+                    <p class="test-quote">
+                        "The Real-View visual charts and process flowcharts completely changed how I digest complex textbook chapters. I uploaded a 40-page PDF and was reviewing flashcards within 5 seconds."
+                    </p>
+                    <div class="test-author-row">
+                        <div class="test-avatar" style="background: #2563eb; color: #fff;">AR</div>
+                        <div>
+                            <div class="test-name">Aarav R.</div>
+                            <div class="test-role">Computer Science Undergraduate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lp-testimonial-card">
+                    <div class="test-stars">
+                        <span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span>
+                        <span class="test-verified-badge">Verified Researcher</span>
+                    </div>
+                    <p class="test-quote">
+                        "The Ebbinghaus Memory Matrix and live entity inspector on the right are extraordinary. Having the 1-page printable cheatsheet ready for exam morning was an absolute game changer."
+                    </p>
+                    <div class="test-author-row">
+                        <div class="test-avatar" style="background: #059669; color: #fff;">PS</div>
+                        <div>
+                            <div class="test-name">Priya S.</div>
+                            <div class="test-role">Biomedical Engineering Researcher</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lp-testimonial-card">
+                    <div class="test-stars">
+                        <span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span><span class="test-star">★</span>
+                        <span class="test-verified-badge">Verified Educator</span>
+                    </div>
+                    <p class="test-quote">
+                        "Being able to drop any curriculum document and get auto-generated quizzes with instant explanations and audio briefings has revolutionized how our cohort prepares for finals."
+                    </p>
+                    <div class="test-author-row">
+                        <div class="test-avatar" style="background: #7c3aed; color: #fff;">DK</div>
+                        <div>
+                            <div class="test-name">David K.</div>
+                            <div class="test-role">Academic Lead & Instructor</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= FAQ Accordion ================= -->
+        <section class="lp-faq-section" id="faq">
+            <div class="lp-section-header">
+                <span class="lp-section-tag">FREQUENTLY ASKED</span>
+                <h2 class="lp-section-title">Common Questions</h2>
+                <p class="lp-section-desc">Key details regarding StudySphere's synthesis engine and format support.</p>
+            </div>
+
+            <div class="lp-faq-container">
+                <div class="lp-faq-item active">
+                    <div class="lp-faq-question">
+                        <span>What file formats can I upload into StudySphere?</span>
+                        <span class="lp-faq-icon">+</span>
+                    </div>
+                    <div class="lp-faq-answer">
+                        StudySphere accepts PDF documents, Microsoft Word (.docx), plain text (.txt), Markdown (.md), CSV datasets, Excel spreadsheets (.xlsx), and raw pasted text. It automatically handles token extraction, paragraph structuring, and stopword filtering across all formats.
+                    </div>
+                </div>
+
+                <div class="lp-faq-item">
+                    <div class="lp-faq-question">
+                        <span>How does the Real-View Visualization engine work?</span>
+                        <span class="lp-faq-icon">+</span>
+                    </div>
+                    <div class="lp-faq-answer">
+                        Unlike static images, our Real-View engine renders dynamic client-side Chart.js canvases with interactive tooltips, percentage shares, multi-axis radar competency evaluations, and clickable nodes that instantly synchronize with the right-side Knowledge Lens inspector.
+                    </div>
+                </div>
+
+                <div class="lp-faq-item">
+                    <div class="lp-faq-question">
+                        <span>How fast is document processing?</span>
+                        <span class="lp-faq-icon">+</span>
+                    </div>
+                    <div class="lp-faq-answer">
+                        Processing is near instantaneous (under 3 seconds). Simply drop your file or paste your notes to immediately launch your workspace across all 9 synchronized modalities.
+                    </div>
+                </div>
+
+                <div class="lp-faq-item">
+                    <div class="lp-faq-question">
+                        <span>What is the Ebbinghaus Retention Matrix?</span>
+                        <span class="lp-faq-icon">+</span>
+                    </div>
+                    <div class="lp-faq-answer">
+                        It is a learning science feature based on Hermann Ebbinghaus's mathematical forgetting curve. It simulates how much information you retain over 1 to 30 days and calculates optimal spaced review sessions to prevent memory decay.
+                    </div>
+                </div>
+
+                <div class="lp-faq-item">
+                    <div class="lp-faq-question">
+                        <span>Can I export diagrams and printable cheatsheets?</span>
+                        <span class="lp-faq-icon">+</span>
+                    </div>
+                    <div class="lp-faq-answer">
+                        Yes. You can download high-resolution PNGs directly from the visual canvas, copy raw Mermaid diagram code, and generate clean, print-ready 1-page cheatsheets formatted for exam day.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Final CTA Banner ================= -->
+        <section class="lp-final-cta-section">
+            <div class="lp-final-cta-card">
+                <div class="final-cta-badge">EXPERIENCE STUDYSPHERE 2.0</div>
+                <h2 class="lp-cta-title">
+                    Ready to Turn Any Document Into <br>
+                    High-Retention Visual Architecture?
+                </h2>
+                <p class="lp-cta-desc">
+                    Upload your notes, syllabus, or research paper now and test all 9 synchronized modalities with zero manual setup.
+                </p>
+                <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'studio' %}" class="lp-btn-primary lp-btn-large">
+                        <span>Launch Studio Workspace</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Footer ================= -->
+        <footer class="lp-footer">
+            <div class="lp-footer-top">
+                <div class="lp-brand-group">
+                    <div class="lp-logo-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    </div>
+                    <span class="lp-logo-text">StudySphere</span>
+                </div>
+                <div style="display: flex; gap: 20px; font-size: 0.84rem; flex-wrap: wrap;">
+                    <a href="{% url 'studio' %}" style="color: var(--lp-text-secondary); text-decoration: none;">Studio Workspace</a>
+                    <a href="#overview" style="color: var(--lp-text-secondary); text-decoration: none;">Overview</a>
+                    <a href="#learning-modes" style="color: var(--lp-text-secondary); text-decoration: none;">9 Learning Modes</a>
+                    <a href="#features" style="color: var(--lp-text-secondary); text-decoration: none;">Comparison</a>
+                    <a href="#faq" style="color: var(--lp-text-secondary); text-decoration: none;">FAQ</a>
+                </div>
+            </div>
+            <div class="lp-footer-bottom">
+                <div>&copy; 2026 StudySphere. AI Multi-Format Learning Studio. Built with Django & Python NLP.</div>
+                <div style="display: flex; gap: 14px; align-items: center;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; color: #10b981; font-weight: 600;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span>System Operational</span>
+                    </span>
+                    <span>v2.0 Visual Edition</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Interactive Client Scripts for Landing Page -->
+    <script>
+        // FAQ Accordion Interaction
+        const faqItems = document.querySelectorAll('.lp-faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.lp-faq-question');
+            if (question) {
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    faqItems.forEach(i => i.classList.remove('active'));
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

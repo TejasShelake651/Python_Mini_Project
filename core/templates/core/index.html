@@ -1,0 +1,981 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySphere — Smart Learning Studio</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3.1">
+    <!-- Chart.js for Real-Time Interactive Visualizations (Visualize AI Engine) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Mermaid.js for Technical Architecture & Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: false, 
+            theme: 'default', 
+            securityLevel: 'loose',
+            themeVariables: { 
+                fontFamily: 'Inter', 
+                primaryColor: '#f8fafc', 
+                primaryBorderColor: '#cbd5e1',
+                primaryTextColor: '#0f172a',
+                lineColor: '#64748b',
+                secondaryColor: '#f1f5f9',
+                tertiaryColor: '#ffffff',
+                mainBkg: '#ffffff',
+                nodeBorder: '#cbd5e1',
+                clusterBkg: '#f8fafc',
+                clusterBorder: '#e2e8f0',
+                edgeLabelBackground: '#ffffff'
+            } 
+        });
+    </script>
+</head>
+<body>
+
+    <!-- Top Bar (Clean, Modern Pill Navigation) -->
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <a href="{% url 'landing' %}" class="pill-btn brand-home-btn" title="Return to Landing Page">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span class="brand-name">StudySphere</span>
+                <span class="brand-tag">v2.0</span>
+            </a>
+
+            <div class="doc-header-title">
+                {% if doc %}{{ doc.title|truncatechars:42 }}{% else %}Ready for Ingestion — Upload Document{% endif %}
+            </div>
+
+            {% if all_docs %}
+            <div class="pager-group">
+                <span class="doc-count-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span>{{ all_docs|length }} Document{{ all_docs|length|pluralize }}</span>
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="top-bar-right">
+            {% if all_docs %}
+            <select class="pill-btn doc-select-dropdown" onchange="if(this.value) window.location.href='/studio/?doc=' + this.value">
+                {% for d in all_docs %}
+                    <option value="{{ d.id }}" {% if doc and doc.id == d.id %}selected{% endif %}>
+                        {{ d.title|truncatechars:28 }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% endif %}
+
+            {% if doc %}
+            <a href="{% url 'export_study_sheet' doc.id %}" target="_blank" class="pill-btn nav-action-btn nav-cheatsheet-btn" title="Printable 1-Page Exam Day Cheatsheet">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect width="12" height="8" x="6" y="14"></rect></svg>
+                <span>Cheatsheet</span>
+            </a>
+            {% endif %}
+
+            <button id="themeToggleBtn" class="pill-btn theme-toggle-btn" title="Toggle Warm Amber Yellow Theme" onclick="toggleAmberTheme()">
+                <span class="theme-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                <span id="themeToggleText">Amber Theme</span>
+            </button>
+
+            <button onclick="document.getElementById('uploadModal').classList.add('active')" class="pill-btn-dark">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Upload Note</span>
+            </button>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="toast-messages-container" id="toastMessagesWrap">
+        {% for message in messages %}
+        <div class="toast-message toast-{{ message.tags|default:'info' }}">
+            <div class="toast-icon">
+                {% if message.tags == 'error' %}⚠️{% elif message.tags == 'success' %}✅{% else %}ℹ️{% endif %}
+            </div>
+            <div class="toast-text">{{ message }}</div>
+            <button type="button" class="toast-close-btn" onclick="this.closest('.toast-message').remove()">✕</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Workspace Layout -->
+    <div class="workspace">
+        
+        <!-- Left Sidebar (Pixel-Perfect from Screenshot) -->
+        <aside class="sidebar">
+            
+            <!-- Study -->
+            <div class="nav-item" data-tab="study" title="Study Guide">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                </div>
+                <span class="nav-label">Study</span>
+            </div>
+
+            <!-- Visual -->
+            <div class="nav-item" data-tab="visual" title="Visual Diagrams">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
+                <span class="nav-label">Visual</span>
+            </div>
+
+            <!-- Notes -->
+            <div class="nav-item" data-tab="notes" title="Notes">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <span class="nav-label">Notes</span>
+            </div>
+
+            <!-- Flashcards -->
+            <div class="nav-item" data-tab="flashcards" title="Flashcards">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="8" y="2" width="13" height="15" rx="2"></rect>
+                        <polyline points="5 6 3 6 3 20 18 20 18 18"></polyline>
+                    </svg>
+                </div>
+                <span class="nav-label">Cards</span>
+            </div>
+
+            <!-- Map -->
+            <div class="nav-item" data-tab="map" title="Concept Map">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v7m0 6v7M2 12h7m6 0h7"></path>
+                    </svg>
+                </div>
+                <span class="nav-label">Map</span>
+            </div>
+
+            <!-- Podcast -->
+            <div class="nav-item" data-tab="podcast" title="Audio Podcast">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                    </svg>
+                </div>
+                <span class="nav-label">Podcast</span>
+            </div>
+
+            <!-- Quiz (Default Active as in Screenshot) -->
+            <div class="nav-item active" data-tab="quiz" title="Quiz">
+                <div class="nav-icon-box">
+                    <span class="notification-dot"></span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <span class="nav-label">Quiz</span>
+            </div>
+
+            <!-- Exam -->
+            <div class="nav-item" data-tab="exam" title="Exam">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <span class="nav-label">Exam</span>
+            </div>
+
+            <!-- Source -->
+            <div class="nav-item" data-tab="source" title="Source">
+                <div class="nav-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <span class="nav-label">Source</span>
+            </div>
+
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-stage">
+            
+            {% if not doc %}
+            <!-- Knowledge Ingestion Studio (Working Dropzone & Text Parser) -->
+            <div class="ingestion-studio-hero">
+                <div class="ingestion-hero-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="status-live-pulse" style="background: #2563eb;"></span>
+                        <span class="ingestion-badge">READY FOR KNOWLEDGE INGESTION</span>
+                    </div>
+                    <h1 class="ingestion-title">Upload Study Material to Synthesize Workspace</h1>
+                    <p class="ingestion-desc">
+                        Drop any syllabus, lecture transcript, research paper, or textbook chapter. StudySphere will automatically parse and generate real-time computational charts, 3D active recall flashcards, 2D concept maps, and interactive quizzes tailored to your material.
+                    </p>
+                </div>
+
+                <form action="{% url 'upload_document' %}" method="POST" enctype="multipart/form-data" class="ingestion-upload-form" id="mainIngestionForm">
+                    {% csrf_token %}
+                    <div class="form-title-group">
+                        <label class="form-input-label">Document Title (Optional)</label>
+                        <input type="text" name="title" placeholder="e.g. Molecular Biology Chapter 4, Microeconomics Midterm Review..." class="modal-input-field">
+                    </div>
+
+                    <!-- Source Selection Tabs -->
+                    <div class="ingestion-source-tabs">
+                        <button type="button" class="ingestion-source-tab active" id="tabSourceFile" onclick="switchIngestMode('file')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            <span>Upload Document File</span>
+                        </button>
+                        <button type="button" class="ingestion-source-tab" id="tabSourceText" onclick="switchIngestMode('text')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+                            <span>Paste Notes or Transcript</span>
+                        </button>
+                    </div>
+
+                    <!-- File Dropzone -->
+                    <div id="ingestFileBox" class="upload-dropzone" onclick="document.getElementById('mainFileInput').click()">
+                        <input type="file" name="file" id="mainFileInput" style="display: none;" accept=".pdf,.docx,.txt,.md,.json,.html,.csv,.xlsx,.jpg,.jpeg,.png,.webp,.bmp" onchange="handleMainFileSelect(this)">
+                        <div class="dropzone-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="dropzone-text" id="mainFileLabel">Drag and drop your study document or note image here, or <span style="text-decoration: underline; color: #0f172a; font-weight: 700;">browse files</span></div>
+                        <div class="dropzone-sub">Supports PDF, DOCX, TXT, CSV, Excel & Images (JPG/PNG/WebP with Native OCR)</div>
+                    </div>
+
+                    <!-- Direct Text Input Area -->
+                    <div id="ingestTextBox" style="display: none;">
+                        <textarea name="raw_text" rows="7" placeholder="Paste your syllabus, textbook excerpts, lecture transcript, or study notes directly here..." class="modal-textarea-field"></textarea>
+                    </div>
+
+                    <div style="margin-top: 6px;">
+                        <button type="submit" class="cta-primary-action" style="margin: 0; width: 100%; justify-content: center; padding: 13px 24px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span>Analyze & Launch Knowledge Workspace</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Capabilities Showcase Bento -->
+                <div class="ingestion-features-grid">
+                    <div class="ingestion-feat-card">
+                        <div class="ingestion-feat-icon">📊</div>
+                        <h4 class="ingestion-feat-title">Computational Charts</h4>
+                        <p class="ingestion-feat-desc">Significance frequency bar, cognitive mastery radar, and retention progression curves.</p>
+                    </div>
+                    <div class="ingestion-feat-card">
+                        <div class="ingestion-feat-icon">🗂️</div>
+                        <h4 class="ingestion-feat-title">3D Active Recall</h4>
+                        <p class="ingestion-feat-desc">Interactive flashcards synthesized directly from definition patterns in your notes.</p>
+                    </div>
+                    <div class="ingestion-feat-card">
+                        <div class="ingestion-feat-icon">🕸️</div>
+                        <h4 class="ingestion-feat-title">2D Concept Network</h4>
+                        <p class="ingestion-feat-desc">Physics-modeled graph displaying relationships and key architectural nodes.</p>
+                    </div>
+                    <div class="ingestion-feat-card">
+                        <div class="ingestion-feat-icon">📝</div>
+                        <h4 class="ingestion-feat-title">Adaptive Assessments</h4>
+                        <p class="ingestion-feat-desc">Auto-generated multiple choice quizzes and timed 10-minute formal mock exams.</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+
+            <!-- ================= VIEW 7: QUIZ ================= -->
+            <section id="section-quiz" class="view-section active">
+                <div class="section-top-label">
+                    <span class="questions-badge">{{ doc.quiz_data|length|default:5 }} PRACTICE QUESTIONS</span>
+                    <button class="more-btn" title="Options">•••</button>
+                </div>
+
+                <!-- Hero Card -->
+                <div id="quizLandingCard" class="hero-card">
+                    <h1 class="hero-title">Practice Quiz & Assessment</h1>
+                    <p class="hero-desc">Test your retention on this document. Every quiz dynamically samples questions from your note's knowledge bank.</p>
+                    
+                    <button id="startQuizBtn" class="cta-primary-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>Start Practice Quiz</span>
+                    </button>
+
+                    <div class="hero-footer-note" style="display: flex; gap: 18px; color: #94a3b8; font-size: 0.85rem;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Instant auto-grading
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Explanations included
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Saved to profile
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Questions Container (Reveals after clicking Start Quiz) -->
+                <div id="quizQuestionsContainer" style="display: none; margin-top: 20px;">
+                    <div id="quizResultBox" style="display: none; margin-bottom: 20px;"></div>
+
+                    <form id="quizForm">
+                        {% for q in doc.quiz_data %}
+                        <div class="hero-card question-card quiz-question-card" data-q-id="{{ q.id }}">
+                            <div class="question-meta-tag">QUESTION {{ forloop.counter }} OF {{ doc.quiz_data|length }}</div>
+                            <h3 class="quiz-question-heading">{{ q.question }}</h3>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                {% for opt in q.options %}
+                                <label class="quiz-option">
+                                    <input type="radio" name="{{ q.id }}" value="{{ opt }}" style="display: none;">
+                                    <span class="quiz-opt-num">{{ forloop.counter }}.</span>
+                                    <span class="quiz-opt-text">{{ opt }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button type="button" id="submitQuizBtn" data-doc-id="{{ doc.id }}" class="pill-btn-dark" style="padding: 12px 32px; font-size: 1rem;">
+                                Submit Answers
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 1: STUDY ================= -->
+            <section id="section-study" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge" style="color: #b45309;">COMPREHENSIVE BRIEFING</span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="hero-card">
+                    <h1 class="hero-title" style="margin-bottom: 14px;">Study Guide & Executive Briefing</h1>
+                    <div class="study-summary-body">
+                        {{ doc.study_summary }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 2: VISUAL ================= -->
+            <section id="section-visual" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge" style="color: #ea580c; display: flex; align-items: center; gap: 8px;">
+                        <span class="status-live-pulse" style="background: #ea580c;"></span>
+                        LIVE VISUAL STUDIO & ARCHITECTURE
+                    </span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="pill-btn studio-tool-btn" id="btnFullscreenStudio" title="Toggle Fullscreen Canvas">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                            <span class="tool-btn-text">Expand View</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-card visual-studio-card" id="visualStudioCard">
+                    <!-- Studio Header -->
+                    <div class="studio-header">
+                        <div>
+                            <div class="studio-badge-row">
+                                <span class="tag-pill tag-gradient">Visual Knowledge Architecture</span>
+                                <span class="tag-pill tag-neutral" id="activeViewModeLabel">Interactive Charts</span>
+                            </div>
+                            <h1 class="hero-title" style="margin-top: 8px;">Visual Knowledge Studio</h1>
+                            <p class="hero-desc">Interactive computational charts, process flowcharts, learning roadmaps, and architectural structures.</p>
+                        </div>
+                    </div>
+
+                    <!-- KPI Metric Cards (Visualize AI Quick Insights) -->
+                    <div class="studio-kpis-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrap" style="background: #f1f5f9; color: #0f172a;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            </div>
+                            <div>
+                                <div class="kpi-label">Dominant Focus</div>
+                                <div class="kpi-value" id="kpiDominantTopic">{{ chart_data.kpis.dominant_topic|default:"Core Systems" }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrap" style="background: #f1f5f9; color: #0f172a;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path></svg>
+                            </div>
+                            <div>
+                                <div class="kpi-label">Cognitive Tier</div>
+                                <div class="kpi-value" id="kpiCognitiveTier">{{ chart_data.kpis.cognitive_tier|default:"High-Yield" }}</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </div>
+                            <div>
+                                <div class="kpi-label">Synthesis Time</div>
+                                <div class="kpi-value" id="kpiEstTime">{{ chart_data.kpis.estimated_minutes|default:3 }} mins</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrap" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                            </div>
+                            <div>
+                                <div class="kpi-label">Curriculum Depth</div>
+                                <div class="kpi-value" id="kpiRetention">{{ chart_data.kpis.retention_strength|default:"94%" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Studio Tab Navigation Bar -->
+                    <div class="studio-nav-bar">
+                        <div class="studio-subtabs">
+                            <button class="pill-btn active visual-subtab-btn" data-diagram="chart">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                <span>Interactive Charts</span>
+                            </button>
+                            <button class="pill-btn visual-subtab-btn" data-diagram="flowchart">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                                <span>Process Flowchart</span>
+                            </button>
+                            <button class="pill-btn visual-subtab-btn" data-diagram="timeline">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>Visual Roadmap</span>
+                            </button>
+                            <button class="pill-btn visual-subtab-btn" data-diagram="architecture">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+                                <span>System Architecture</span>
+                            </button>
+                        </div>
+                        <div class="studio-actions-group">
+                            <button class="pill-icon-btn" id="zoomOutBtn" title="Zoom Out">−</button>
+                            <span class="zoom-level-label" id="zoomLevelText">100%</span>
+                            <button class="pill-icon-btn" id="zoomInBtn" title="Zoom In">+</button>
+                            <button class="pill-icon-btn" id="zoomResetBtn" title="Reset Zoom">↺</button>
+                            <button class="pill-btn" id="exportVisualBtn" style="padding: 6px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px;" title="Download PNG">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1. INTERACTIVE CHARTS STUDIO PANEL -->
+                    <div id="diagram-chart" class="visual-diagram-panel studio-content-panel active">
+                        <div class="chart-controls-toolbar">
+                            <div class="chart-type-filters">
+                                <button class="chart-type-pill active" data-chart-type="bar">Significance (Bar)</button>
+                                <button class="chart-type-pill" data-chart-type="radar">Cognitive Mastery (Radar)</button>
+                                <button class="chart-type-pill" data-chart-type="donut">Topic Share (Donut)</button>
+                                <button class="chart-type-pill" data-chart-type="progression">Retention Curve (Area)</button>
+                            </div>
+                            <div class="chart-status-hint">Click any bar or data node for instant concept inspection</div>
+                        </div>
+
+                        <!-- Live Interactive Chart Canvas Container -->
+                        <div class="chart-viewport-wrapper" id="chartViewport">
+                            <div class="interactive-chart-box" id="interactiveChartContainer">
+                                <canvas id="interactiveChartCanvas" height="380"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Concept Deep-Dive Inspector (Slides down when bar/slice clicked) -->
+                        <div class="concept-deep-dive-card" id="chartNodeInspector" style="display: none;">
+                            <div class="inspector-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="inspector-badge" id="inspectorBadge">Concept</div>
+                                    <h3 class="inspector-title" id="inspectorTitle">Python</h3>
+                                    <span class="inspector-metric" id="inspectorMetric">14 Mentions (28%)</span>
+                                </div>
+                                <button class="inspector-close-btn" id="closeInspectorBtn">✕</button>
+                            </div>
+                            <p class="inspector-summary" id="inspectorSummary">Concept explanation and architectural role...</p>
+                            <div class="inspector-grid">
+                                <div class="inspector-detail-item">
+                                    <span class="detail-label">Production Implementation</span>
+                                    <span class="detail-text" id="inspectorScenario">Used in mission-critical backend processing pipelines.</span>
+                                </div>
+                                <div class="inspector-detail-item">
+                                    <span class="detail-label">Technical Evaluation</span>
+                                    <span class="detail-text" id="inspectorViva">Explain how this entity behaves under high load.</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                                <button class="pill-btn-dark" id="btnAskVivaAboutConcept" style="font-size: 0.82rem; padding: 6px 14px;">
+                                    Inspect Architectural Node ›
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. PROCESS FLOWCHART STUDIO PANEL -->
+                    <div id="diagram-flowchart" class="visual-diagram-panel studio-content-panel" style="display: none;">
+                        <div class="panel-view-switcher">
+                            <button class="pill-btn active flowchart-view-toggle" data-view="cards">Stage Sequence View</button>
+                            <button class="pill-btn flowchart-view-toggle" data-view="mermaid">Graph Topology View</button>
+                        </div>
+
+                        <!-- Interactive Steps Cards View -->
+                        <div id="flowchartCardsView" class="flowchart-cards-container">
+                            <div class="stepper-controls-bar">
+                                <span class="stepper-progress-text" id="stepperStatusText">Stage 1 of 6: Ingestion</span>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="pill-btn" id="btnPrevStep" style="padding: 6px 14px; font-size: 0.8rem;">Previous</button>
+                                    <button class="pill-btn-dark" id="btnNextStep" style="padding: 6px 16px; font-size: 0.8rem;">Next Stage</button>
+                                    <button class="pill-btn" id="btnAutoPlaySteps" style="padding: 6px 12px; font-size: 0.8rem;">Auto Play</button>
+                                </div>
+                            </div>
+                            <div class="flowchart-cards-track" id="flowchartTrack">
+                                {% for step in doc.diagrams_data.flowchart_steps %}
+                                <div class="flow-stage-card {% if forloop.first %}active{% endif %}" data-step-index="{{ forloop.counter0 }}">
+                                    <div class="flow-card-header">
+                                        <div class="flow-icon-bubble">{{ step.step }}</div>
+                                        <span class="flow-badge">{{ step.badge }}</span>
+                                    </div>
+                                    <h4 class="flow-card-title">{{ step.title }}</h4>
+                                    <p class="flow-card-desc">{{ step.desc }}</p>
+                                    <div class="flow-output-tag">
+                                        <span>Output:</span> <strong>{{ step.output }}</strong>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="chart-empty-state">Upload study material to view interactive stage walkthrough.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Mermaid Rendered Graph View -->
+                        <div id="flowchartMermaidView" class="mermaid-diagram-container" style="display: none;">
+                            <div class="zoom-target-wrapper">
+                                <div class="mermaid">
+                                    {{ doc.diagrams_data.flowchart|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. VISUAL ROADMAP STUDIO PANEL -->
+                    <div id="diagram-timeline" class="visual-diagram-panel studio-content-panel" style="display: none;">
+                        <div class="panel-view-switcher">
+                            <button class="pill-btn active roadmap-view-toggle" data-view="track">Structured Milestones</button>
+                            <button class="pill-btn roadmap-view-toggle" data-view="mermaid">Timeline Diagram</button>
+                        </div>
+
+                        <!-- Structured Milestone Track -->
+                        <div id="roadmapTrackView" class="milestone-track-container">
+                            {% for m in doc.diagrams_data.roadmap_milestones %}
+                            <div class="milestone-card">
+                                <div class="milestone-left">
+                                    <span class="milestone-stage-tag" style="background: #f1f5f9; color: #0f172a;">
+                                        {{ m.stage }}
+                                    </span>
+                                    <div class="milestone-status-chip">{{ m.status }}</div>
+                                </div>
+                                <div class="milestone-body">
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                        <h3 class="milestone-title">{{ m.title }}</h3>
+                                        <span class="milestone-time">{{ m.time }}</span>
+                                    </div>
+                                    <p class="milestone-desc">{{ m.desc }}</p>
+                                    <div class="milestone-objectives">
+                                        {% for obj in m.objectives %}
+                                        <label class="milestone-checkbox-label">
+                                            <input type="checkbox" class="milestone-chk">
+                                            <span>{{ obj }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="chart-empty-state">No milestones generated yet.</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Mermaid Timeline View -->
+                        <div id="roadmapMermaidView" class="mermaid-diagram-container" style="display: none;">
+                            <div class="zoom-target-wrapper">
+                                <div class="mermaid">
+                                    {{ doc.diagrams_data.timeline|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. SYSTEM ARCHITECTURE STUDIO PANEL -->
+                    <div id="diagram-architecture" class="visual-diagram-panel studio-content-panel" style="display: none;">
+                        <div class="panel-view-switcher">
+                            <button class="pill-btn active arch-view-toggle" data-view="layers">Layered System Architecture</button>
+                            <button class="pill-btn arch-view-toggle" data-view="mermaid">UML Class Diagram</button>
+                        </div>
+
+                        <!-- Layered Architecture View -->
+                        <div id="archLayersView" class="architecture-layers-grid">
+                            {% for layer in doc.diagrams_data.architecture_layers %}
+                            <div class="arch-layer-card" style="border-left: 4px solid {{ layer.color|default:'#0f172a' }};">
+                                <div class="arch-card-top">
+                                    <div class="arch-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ layer.color|default:'#0f172a' }}" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="m9 8 6 4-6 4Z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="arch-layer-name">{{ layer.layer }}</h4>
+                                        <span class="arch-role-desc">{{ layer.role }}</span>
+                                    </div>
+                                </div>
+                                <div class="arch-tech-badge">{{ layer.tech }}</div>
+                                <div class="arch-modules-tags">
+                                    {% for mod in layer.modules %}
+                                    <span class="arch-module-chip">{{ mod }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="chart-empty-state">No architecture data loaded.</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Mermaid UML Class Diagram -->
+                        <div id="archMermaidView" class="mermaid-diagram-container" style="display: none;">
+                            <div class="zoom-target-wrapper">
+                                <div class="mermaid">
+                                    {{ doc.diagrams_data.class_diagram|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================= VIEW 3: NOTES ================= -->
+            <section id="section-notes" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge">STRUCTURED BULLETS</span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="hero-card">
+                    <h1 class="hero-title" style="margin-bottom: 18px;">Structured Notes</h1>
+                    
+                    <h3 class="notes-subtitle" style="color: #818cf8;">Key Takeaways</h3>
+                    <ul class="notes-takeaways-list">
+                        {% for point in doc.notes_data.key_takeaways %}
+                        <li class="note-takeaway-item">
+                            <span class="note-bullet">•</span>
+                            <span>{{ point }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <h3 class="notes-subtitle" style="color: #34d399;">Core Terminology</h3>
+                    <div class="notes-definitions-grid">
+                        {% for def in doc.notes_data.definitions %}
+                        <div class="note-definition-card">
+                            {{ def }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 4: FLASHCARDS ================= -->
+            <section id="section-flashcards" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge" style="color: #16a34a;">ACTIVE RECALL</span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="flashcards-container">
+                    <div class="card-scene">
+                        <div class="flashcard" id="activeFlashcard">
+                            <div class="card-face card-face-front">
+                                <span class="card-tag" id="cardCategoryTag">Concept</span>
+                                <div class="card-text" id="cardFrontText">Loading flashcard...</div>
+                                <div class="card-hint">Click anywhere on the card to flip</div>
+                            </div>
+                            <div class="card-face card-face-back">
+                                <span class="card-tag">Definition & Answer</span>
+                                <div class="card-text" id="cardBackText" style="font-size: 1.05rem; font-weight: 500;">Loading answer...</div>
+                                <div class="card-hint">Click to flip back</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flashcard-controls">
+                        <button id="prevCardBtn" class="pill-btn">Previous</button>
+                        <button id="flipCardBtn" class="pill-btn">Flip Card</button>
+                        <span id="cardCounter" style="font-weight: 600; color: #64748b; font-size: 0.9rem;">Card 1 of 10</span>
+                        <button id="nextCardBtn" class="pill-btn-dark">Next</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 5: MAP ================= -->
+            <section id="section-map" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge" style="color: #0284c7; display: flex; align-items: center; gap: 8px;">
+                        <span class="status-live-pulse" style="background: #0284c7;"></span>
+                        INTERACTIVE CONCEPT NETWORK GRAPH
+                    </span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="hero-card visual-map-card">
+                    <!-- Map Toolbar -->
+                    <div class="map-controls-bar">
+                        <div class="map-search-wrapper">
+                            <input type="text" id="mapSearchInput" class="map-search-input" placeholder="Search or filter concept nodes...">
+                        </div>
+                        <div class="map-actions-group">
+                            <button class="pill-btn map-tool-btn" id="mapZoomIn" title="Zoom In">+</button>
+                            <button class="pill-btn map-tool-btn" id="mapZoomOut" title="Zoom Out">−</button>
+                            <button class="pill-btn map-tool-btn" id="mapCenterBtn" title="Center View">Center</button>
+                            <button class="pill-btn map-tool-btn" id="mapPhysicsToggle" title="Pause / Resume Physics Simulation">Pause</button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Viewport -->
+                    <div class="concept-map-viewport" id="conceptMapViewport">
+                        <canvas id="conceptMapCanvas"></canvas>
+                        <div class="map-hint-overlay">
+                            <span>Drag nodes with mouse • Scroll wheel to zoom • Click a node to view definition</span>
+                        </div>
+                    </div>
+
+                    <!-- Floating Node Inspector on Canvas -->
+                    <div id="mapNodeInspector" class="map-node-floating-card" style="display: none;">
+                        <div class="map-inspector-top">
+                            <div class="map-inspector-badges">
+                                <span class="map-node-badge" id="mapNodeBadge">Core Subject</span>
+                                <span class="map-node-freq-badge" id="mapNodeFreq"></span>
+                            </div>
+                            <button id="closeMapInspectorBtn" class="inspector-close-btn" title="Close Inspector">✕</button>
+                        </div>
+                        <h4 id="mapNodeLabel" class="map-node-title">Concept</h4>
+                        
+                        <div class="map-inspector-block">
+                            <span class="map-inspector-label">DOCUMENT DEFINITION &amp; ROLE</span>
+                            <p id="mapNodeDesc" class="map-node-text"></p>
+                        </div>
+
+                        <div class="map-inspector-block" id="mapExcerptBlock">
+                            <span class="map-inspector-label">SOURCE EXCERPT FROM UPLOADED FILE</span>
+                            <blockquote id="mapNodeExcerpt" class="map-node-excerpt"></blockquote>
+                        </div>
+
+                        <div class="map-inspector-block" id="mapConnectionsBlock">
+                            <span class="map-inspector-label">CONNECTED CONCEPTS</span>
+                            <div id="mapNodeConnections" class="map-connections-pills"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 6: PODCAST ================= -->
+            <section id="section-podcast" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge">AUDIO WALKTHROUGH</span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="hero-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 class="hero-title" style="font-size: 1.5rem;">Podcast Briefing</h2>
+                            <p id="podcastStatus" style="color: #64748b; font-size: 0.95rem; margin-top: 4px;">Ready to listen • Synthesized from document text</p>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <select id="podcastSpeed" class="pill-btn" style="padding: 9px 14px; font-size: 0.88rem;" title="Playback Speed">
+                                <option value="1.0" selected>1.0x Normal</option>
+                                <option value="1.25">1.25x</option>
+                                <option value="1.5">1.5x</option>
+                            </select>
+                            <button id="podcastRestartBtn" class="pill-btn" style="padding: 9px 14px; font-size: 0.88rem;" title="Restart from beginning">
+                                ↺ Replay
+                            </button>
+                            <button id="podcastPlayBtn" class="pill-btn-dark" style="padding: 10px 24px; font-size: 1rem;">
+                                Play Audio
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if doc.podcast_audio_url %}
+                    <div style="margin-bottom: 16px;">
+                        <audio id="podcastAudioSource" src="{{ doc.podcast_audio_url }}" controls style="width: 100%; height: 42px; border-radius: 9999px; outline: none;"></audio>
+                    </div>
+                    {% endif %}
+
+                    <div class="podcast-script-card" id="podcastScriptContent">
+                        {{ doc.podcast_script }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 8: EXAM ================= -->
+            <section id="section-exam" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge">FORMAL EXAMINATION</span>
+                    <span id="examTimer" class="pill-btn timer-pill">10:00</span>
+                </div>
+                <div class="hero-card" id="examIntro">
+                    <h1 class="hero-title">Timed Mock Exam</h1>
+                    <p class="hero-desc">10 randomized comprehensive questions designed to test your full retention.</p>
+                    <button id="startExamBtn" class="cta-primary-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                        <span>Start Timed Exam</span>
+                    </button>
+                </div>
+
+                <div id="examQuestionsContainer" style="display: none; margin-top: 20px;">
+                    <div id="examResultBox" style="display: none; margin-bottom: 20px;"></div>
+                    <form id="examForm">
+                        {% for q in doc.exam_data %}
+                        <div class="hero-card question-card exam-question-card" data-q-id="{{ q.id }}">
+                            <div class="question-meta-tag">EXAM QUESTION {{ forloop.counter }}</div>
+                            <h3 class="exam-question-heading">{{ q.question }}</h3>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                {% for opt in q.options %}
+                                <label class="quiz-option">
+                                    <input type="radio" name="{{ q.id }}" value="{{ opt }}" style="display: none;">
+                                    <span class="quiz-opt-num">{{ forloop.counter }}.</span>
+                                    <span class="quiz-opt-text">{{ opt }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div style="text-align: right; margin-top: 18px;">
+                            <button type="button" id="submitExamBtn" data-doc-id="{{ doc.id }}" class="pill-btn-dark">Submit Exam</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 9: SOURCE ================= -->
+            <section id="section-source" class="view-section">
+                <div class="section-top-label">
+                    <span class="questions-badge">DOCUMENT SOURCE</span>
+                    <button class="more-btn">•••</button>
+                </div>
+                <div class="hero-card">
+                    <h1 class="hero-title" style="margin-bottom: 14px;">Source Text</h1>
+                    <pre class="source-code-block">{{ doc.raw_text }}</pre>
+                </div>
+            </section>
+
+            {% endif %}
+
+        </main>
+
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="modal-title">Upload Learning Document</h3>
+                <button onclick="document.getElementById('uploadModal').classList.remove('active')" class="modal-close-btn">&times;</button>
+            </div>
+
+            <form action="{% url 'upload_document' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="margin-bottom: 14px;">
+                    <input type="text" name="title" placeholder="Document Title (e.g., Python Architecture, Systems Design)" class="modal-input-field">
+                </div>
+
+                <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" name="file" id="fileInput" style="display: none;" onchange="document.getElementById('fileStatusText').textContent = this.files[0].name">
+                    <div style="margin-bottom: 8px; color: #0f172a;">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </div>
+                    <p class="dropzone-prompt" id="fileStatusText">Click to choose a file or drag & drop</p>
+                    <p class="dropzone-sub">Supports PDF, DOCX, TXT, CSV, Excel & Images (JPG/PNG/WebP with OCR)</p>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <textarea name="raw_text" rows="3" placeholder="Or paste note text directly here..." class="modal-textarea-field"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="document.getElementById('uploadModal').classList.remove('active')" class="pill-btn">Cancel</button>
+                    <button type="submit" class="pill-btn-dark">Process Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Theme Switcher Script -->
+    <script>
+        function applySavedTheme() {
+            const saved = localStorage.getItem('studysphere-amber-theme');
+            const textEl = document.getElementById('themeToggleText');
+            if (saved === 'enabled') {
+                document.body.classList.add('theme-amber');
+                if (textEl) textEl.textContent = 'Clean Theme';
+            } else {
+                document.body.classList.remove('theme-amber');
+                if (textEl) textEl.textContent = 'Amber Theme';
+            }
+        }
+        function toggleAmberTheme() {
+            const isAmber = document.body.classList.toggle('theme-amber');
+            localStorage.setItem('studysphere-amber-theme', isAmber ? 'enabled' : 'disabled');
+            const textEl = document.getElementById('themeToggleText');
+            if (textEl) textEl.textContent = isAmber ? 'Clean Theme' : 'Amber Theme';
+        }
+        applySavedTheme();
+    </script>
+
+    <!-- Data Injection for Client-Side Scripting -->
+    <script>
+        window.CURRENT_DOC_ID = {% if doc %}{{ doc.id }}{% else %}null{% endif %};
+        {% if doc %}
+        window.FLASHCARDS_DATA = {{ flashcards_data_json|safe }};
+        window.MAP_DATA = {{ map_data_json|safe }};
+        window.CHART_DATA = {{ chart_data_json|safe }};
+        window.DIAGRAMS_DATA = {{ diagrams_data_json|safe }};
+        {% else %}
+        window.FLASHCARDS_DATA = [];
+        window.MAP_DATA = {};
+        window.CHART_DATA = {};
+        window.DIAGRAMS_DATA = {};
+        {% endif %}
+    </script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
