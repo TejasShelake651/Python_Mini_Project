@@ -19,3 +19,8 @@ Thumbs.db
 media/audio/*.wav
 media/audio/*.mp3
 media/charts/*.png
+
+
+# Documents and Reports
+*.pdf
+*.docx
